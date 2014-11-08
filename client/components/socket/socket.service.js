@@ -64,7 +64,15 @@ angular.module('conductorMhdApp')
         });
 
         initiateRoundTrip();
-      }
+      },
 
+      getCurrentServerTime: function(){
+        var timeOffset = fastestRoundTrip?  fastestRoundTrip.getTimeOffset() : 0;
+        return new Date().getTime() + fastestRoundTrip.getTimeOffset();
+      },
+
+      getBestRoundtripLatency: function() {
+        return fastestRoundTrip?  fastestRoundTrip.getCommunicationLatency() : -1;
+      }
     };
   });
