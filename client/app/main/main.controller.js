@@ -5,4 +5,8 @@ angular.module('conductorMhdApp')
 
     ntp.startMeasurements();
 
+    $scope.$on('$destroy', function() {
+      ntp.stopMeasurements();
+    });
+
   });

@@ -29,13 +29,11 @@ angular.module('conductorMhdApp')
       MAX_TRIPS = 1000, 
       fastestRoundTrip;
 
+    var initiateRoundTrip = function() {
+      socket.emit('ntp', {timeStamp: new Date().getTime()});
+    };
     return {
-      
       startMeasurements: function() {
-
-        var initiateRoundTrip = function() {
-          socket.emit('ntp', {timeStamp: new Date().getTime()});
-        };
 
         socket.on('ntp', function(data){
           if(roundtripCount++ < MAX_TRIPS){
@@ -52,6 +50,10 @@ angular.module('conductorMhdApp')
         initiateRoundTrip();
       },
 
+      stopMeasurements: function() {
+        socket.removeAllListeners('ntp');
+      },
+      
       getCurrentServerTime: function(){
         var timeOffset = fastestRoundTrip ? fastestRoundTrip.getTimeOffset() : 0;
         return new Date().getTime() + timeOffset; 
