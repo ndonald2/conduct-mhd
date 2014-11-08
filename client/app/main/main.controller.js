@@ -1,14 +1,8 @@
 'use strict';
 
 angular.module('conductorMhdApp')
-  .controller('MainCtrl', function ($scope, $http, socket) {
+  .controller('MainCtrl', function ($scope, ntp) {
 
-    //$http.get('/api/things').success(function(awesomeThings) {
-    //  $scope.awesomeThings = awesomeThings;
-    //  socket.syncUpdates('thing', $scope.awesomeThings);
-    //});
+    ntp.startMeasurements();
 
-    //$scope.$on('$destroy', function () {
-    //  socket.unsyncUpdates('thing');
-    //});
   });
