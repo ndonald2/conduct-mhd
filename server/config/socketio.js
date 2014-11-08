@@ -21,7 +21,7 @@ function onConnect(socket) {
     console.log("ntp: " + data.timeStamp);
     
     socket.emit('ntp', {
-      serverReceivedTime:  new Date().getTime(),
+      serverReceivedTime: new Date().getTime(),
       clientSentTime: data.timeStamp
     });
   });

@@ -1,6 +1,28 @@
 /* global io */
 'use strict';
 
+var RoundTrip = function(serverResponse) {
+    
+    var clientSentTime = serverResponse.clientSentTime;
+    var serverReceivedTime = serverResponse.serverReceivedTime;
+    var clientReceivedTime = new Date().getTime();
+    
+    var self = {
+      // how far ahead is the server of the client
+      getTimeOffset: function(){
+        return serverReceivedTime - (clientSentTime + self.getCommunicationLatency())
+      },
+      // how long did it take for a message to get from client to server
+      getCommunicationLatency: function() {
+        return (clientReceivedTime - clientSentTime) / 2;
+      }
+    };
+    
+    console.log("new RoundTrip. latency is: " + self.getCommunicationLatency() + " offset is: " + self.getTimeOffset());
+    
+    return self;
+}
+
 angular.module('conductorMhdApp')
   .factory('socket', function(socketFactory) {
 
@@ -15,60 +37,34 @@ angular.module('conductorMhdApp')
       ioSocket: ioSocket
     });
 
+    var roundtripCount = 0, 
+      MAX_TRIPS = 1000, 
+      currentServerTime = 0,
+      fastestRoundTrip;
+
     return {
       socket: socket,
+      
+      startNTPMeasurements: function() {
 
-      /**
-       * Register listeners to sync an array with updates on a model
-       *
-       * Takes the array we want to sync, the model name that socket updates are sent from,
-       * and an optional callback function after new items are updated.
-       *
-       * @param {String} modelName
-       * @param {Array} array
-       * @param {Function} cb
-       */
-      syncUpdates: function (modelName, array, cb) {
-        cb = cb || angular.noop;
+        var initiateRoundTrip = function() {
+          socket.emit('ntp', {timeStamp: new Date().getTime()});
+        };
 
-        /**
-         * Syncs item creation/updates on 'model:save'
-         */
-        socket.on(modelName + ':save', function (item) {
-          var oldItem = _.find(array, {_id: item._id});
-          var index = array.indexOf(oldItem);
-          var event = 'created';
-
-          // replace oldItem if it exists
-          // otherwise just add item to the collection
-          if (oldItem) {
-            array.splice(index, 1, item);
-            event = 'updated';
-          } else {
-            array.push(item);
+        socket.on('ntp', function(data){
+          if(roundtripCount++ < MAX_TRIPS){
+            setTimeout(function() {
+              initiateRoundTrip();
+            }, 500);
           }
-
-          cb(event, item, array);
+          var trip = RoundTrip(data);
+          if(!fastestRoundTrip || trip.getCommunicationLatency() < fastestRoundTrip.getCommunicationLatency()){
+            fastestRoundTrip = trip;
+          }
         });
 
-        /**
-         * Syncs removed items on 'model:remove'
-         */
-        socket.on(modelName + ':remove', function (item) {
-          var event = 'deleted';
-          _.remove(array, {_id: item._id});
-          cb(event, item, array);
-        });
-      },
-
-      /**
-       * Removes listeners for a models updates on the socket
-       *
-       * @param modelName
-       */
-      unsyncUpdates: function (modelName) {
-        socket.removeAllListeners(modelName + ':save');
-        socket.removeAllListeners(modelName + ':remove');
+        initiateRoundTrip();
       }
+
     };
   });
