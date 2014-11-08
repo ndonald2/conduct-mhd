@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('conductorMhdApp')
-  .controller('MainCtrl', function ($scope, $http, socket) {
+  .controller('MainCtrl', function ($scope, $http, ntp) {
 
-    socket.startNTPMeasurements();
+    ntp.startMeasurements();
 
   });
