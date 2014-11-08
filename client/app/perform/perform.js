@@ -3,8 +3,11 @@
 angular.module('conductorMhdApp')
   .config(function ($routeProvider) {
     $routeProvider
-      .when('/perform', {
+      .when('/perform/:side', {
         templateUrl: 'app/perform/perform.html',
         controller: 'PerformCtrl'
+      })
+      .when('/perform', {
+        redirectTo: '/perform/A'
       });
   });
