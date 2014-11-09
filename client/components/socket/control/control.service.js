@@ -3,6 +3,8 @@
 angular.module('conductorMhdApp')
   .factory('control', function($rootScope, socket) {
 
+    socket.emit('control:update', controlState);
+
     socket.forward('control:assign');
     
     return {
