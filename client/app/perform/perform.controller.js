@@ -9,13 +9,14 @@ angular.module('conductorMhdApp')
       $location.path('/');
     }
 
-    $scope.side = side;
     var evaluateBestLatency = function() {
         var latency = ntp.getBestRoundtripLatency();
         $scope.pingLatency = latency;      
         return (latency < constants.maxLatency);
     };
 
+    $scope.side = side;
+    $scope.maxLatency = constants.maxLatency;
     $scope.waitingForPing = false;
     
     ntp.startMeasurements();
