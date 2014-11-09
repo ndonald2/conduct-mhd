@@ -5,7 +5,7 @@ angular.module('conductorMhdApp')
       
       var evaluateBestLatency = function() {
           var latency = ntp.getBestRoundtripLatency();
-          var isGoodEnough = (latency < constants.minLatency);
+          var isGoodEnough = (latency < constants.maxLatency);
           $scope.pingLatency = latency;      
           return isGoodEnough;
       };
@@ -24,6 +24,7 @@ angular.module('conductorMhdApp')
           startPerforming(side);
         }
         else {
+          $scope.waitingForPing = true;
           $scope.$on('ntp:update', function() {
             evaluateBestLatency(); 
           });

@@ -1,25 +1,19 @@
-.modal-primary,
-.modal-info,
-.modal-success,
-.modal-warning,
-.modal-danger {
-  .modal-header {
-    color: #fff;
-    border-radius: 5px 5px 0 0;
-  }
+.modal-fs-host {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0,0.7);
 }
-.modal-primary .modal-header {
-  background: $brand-primary;
-}
-.modal-info .modal-header {
-  background: $brand-info;
-}
-.modal-success .modal-header {
-  background: $brand-success;
-}
-.modal-warning .modal-header {
-  background: $brand-warning;
-}
-.modal-danger .modal-header {
-  background: $brand-danger;
+
+.modal-box {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 20px;
+  background-color: #404040;
+  max-width: 90%;
+  min-height: 120px;
 }
