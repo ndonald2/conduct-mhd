@@ -26,9 +26,12 @@ angular.module('conductorMhdApp')
       $scope.waitingForPing = !goodEnough;
       if (goodEnough) {
         ntp.stopMeasurements();
-        synth.start(ntp.getCurrentServerTime());
       }
     });
+
+    $scope.playIt = function() {
+      synth.start(ntp.getCurrentServerTime());
+    };
 
     $scope.$on('synth:beat', function(e, beat) {
       $scope.beatNum = beat;
