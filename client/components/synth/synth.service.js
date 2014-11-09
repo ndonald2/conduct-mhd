@@ -9,6 +9,13 @@ angular.module('conductorMhdApp')
     var MILLIS_PER_SECOND = 1000;
     var SECONDS_PER_MEASURE = (60.0 / BPM) * 4;
 
+    // IDEA: Don't use score at all
+    // - Set transport to loop 16 bars
+    // - Register interval for each instrument
+    // - Peek at transport time and use that to index note info
+    //   - Could even have helper functions to get note info for a given transport time 
+    // - Can use measure index as shift if desired
+
     var Score = {
       'longTones' : [['0:0', 'A2'], ['0:1', 'A3'], ['0:2', 'A2'], ['0:3', 'A3']]
     };
