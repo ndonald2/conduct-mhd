@@ -1,4 +1,6 @@
-<div class="col-md-12">
+<div class="container">
   <h1>This is the perform view.</h1>
   <div><h2>I am on side {{side}}</h2></div>
-</div>
+  <modal type="fullscreen" ng-show="waitingForPing">
+      <h4>Waiting for fast ping (&lt;50ms). Fastest so far: {{pingLatency}} ms</h4> 
+  </modal></div>
