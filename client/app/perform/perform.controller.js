@@ -18,7 +18,8 @@ angular.module('conductorMhdApp')
 
     $scope.side = side;
     $scope.maxLatency = constants.maxLatency;
-    $scope.waitingForPing = false;
+    $scope.waitingForPing = true;
+    $scope.playing = false;
     
     ntp.startMeasurements();
     $scope.$on('ntp:update', function() {
@@ -34,6 +35,7 @@ angular.module('conductorMhdApp')
         instrument: 'melody',
         serverTime: ntp.getCurrentServerTime()
       });
+      $scope.playing = true;
     };
 
     $scope.$on('synth:beat', function(e, seqPos) {
