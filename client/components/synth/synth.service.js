@@ -120,11 +120,11 @@ angular.module('conductorMhdApp')
 
         //buildScore('melody');
         //buildScore('bass');
-        buildScore('sprinkles');
+        //buildScore('sprinkles');
         
-        //_.forOwn(opts.voices, function(idx, name) {
-        //  buildScore(name, [idx]);
-        //});
+        _.forOwn(opts.voices, function(idx, name) {
+          buildScore(name, [idx]);
+        });
 
         var syncedTime = syncedTransportTime(opts.serverTime);
         Tone.Transport.setTransportTime(syncedTime);

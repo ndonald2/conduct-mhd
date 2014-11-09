@@ -6,13 +6,13 @@ var lastPartAssigned = 0;
 var registerSocket = function(socket) {
   socket.on('control:assign', function(data) {
     var assignedVoices = {
-      'sprinkles': 1
+      'sprinkles': 0 
     };
     if (data.side === 'A') {
       assignedVoices.melody = lastPartAssigned;
       lastPartAssigned = (lastPartAssigned + 1) % NUM_MELODY_PARTS;
     } else if (data.side === 'B') {
-      assignedVoices.bass = 1;
+      assignedVoices.bass = 0;
     }
     socket.emit('control:assign', assignedVoices); 
     console.log('Client assigned to: ', assignedVoices);
