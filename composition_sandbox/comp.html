@@ -59,16 +59,23 @@
     var scaleDegree = function(degree) {
       var octave = Math.floor(degree / scales[currentScale].length);
       var baseNumber = degree % scales[currentScale].length;
-      return scales[currentScale][baseNumber] + 12 * octave;    
+      var ret = scales[currentScale][baseNumber] + 12 * octave;
+      while(ret < 0){
+        ret += 12;
+      }
+      return ret;    
     }
 
     var NUM_ARPEGG_VOICES = 8;
 
-    var sequences = [];
+    
+    
+    
     //arpeggios (room side A)
+    var melodySequences = [];
     for(var seqIndex = 0; seqIndex < NUM_ARPEGG_VOICES; seqIndex++){
       var seq = []
-      sequences.push(seq);
+      melodySequences.push(seq);
       
       for(var section = 0; section < 2 * scales.length; section ++){
         if(section % 2 == 0){
@@ -87,6 +94,7 @@
     // "bass line" (room side B)
     currentScale = 0;
     var bassLine = [];
+    var bassSequences = []
    for(var section = 0; section < 2 * scales.length; section ++){
       if(section % 2 == 0){
        currentScale = (currentScale + 1) % scales.length;
@@ -94,10 +102,16 @@
        bassLine = bassLine.concat([scaleDegree(0), "", scaleDegree(0), "", scaleDegree(4), "", scaleDegree(0), "", "", "", "", "", "", "", "", "" ])
     }
     
-    sequences.push(bassLine);
+    bassSequences.push(bassLine);
 
 
+
+    
     /////////////// NICK !!!! the sequences is in the sequences variable //////////////
+
+
+    var sequences = melodySequences.concat(bassSequences);
+    
 
     console.log(sequences);
     
@@ -150,7 +164,7 @@
       for(var step = 0; step < sequenceForThisVoice.length; step++){
         var thisStepVal = sequenceForThisVoice[step];
         if(thisStepVal !== ""){
-          scoreForThisVoice.push([step * secsPer16th, [midiToFreq(70 + thisStepVal)]]);
+          scoreForThisVoice.push([step * secsPer16th, [midiToFreq(50 + thisStepVal)]]);
         }
       }
       
