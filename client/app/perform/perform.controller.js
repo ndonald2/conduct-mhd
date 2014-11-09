@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('conductorMhdApp')
-  .controller('PerformCtrl', function ($scope, $location, $routeParams, synth, ntp, constants) {
+  .controller('PerformCtrl', function ($scope, $location, $routeParams, synth, control, ntp, constants) {
     
     function evaluateBestLatency() {
         var latency = ntp.getBestRoundtripLatency();
@@ -21,6 +21,12 @@ angular.module('conductorMhdApp')
     $scope.waitingForPing = true;
     $scope.playing = false;
     
+    $scope.$on('socket:control:assign', function(e, data) {
+      console.log(data);
+    });
+
+    control.assign(side);
+
     ntp.startMeasurements();
     $scope.$on('ntp:update', function() {
       var goodEnough = evaluateBestLatency(); 
