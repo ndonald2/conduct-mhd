@@ -1,12 +1,9 @@
 'use strict';
 
 angular.module('conductorMhdApp')
-  .controller('MainCtrl', function ($scope, ntp) {
+  .controller('MainCtrl', function ($scope) {
+     
+      $scope.redirectAfterGoodPing = function(side) {
 
-    ntp.startMeasurements();
-
-    $scope.$on('$destroy', function() {
-      ntp.stopMeasurements();
-    });
-
+      };
   });

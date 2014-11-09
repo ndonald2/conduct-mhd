@@ -8,6 +8,11 @@ $fa-font-path: "/bower_components/font-awesome/fonts";
  * App-wide Styles
  */
 
+body {
+  background-color: #101010;
+  color: white;
+}
+
 .browsehappy {
     margin: 0.2em 0;
     background: #ccc;
