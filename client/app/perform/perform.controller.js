@@ -8,4 +8,6 @@ angular.module('conductorMhdApp')
     if(!_.contains(constants.sides, side)) {
       $location.path('/');
     }
+
+    $scope.side = side;
   });
