@@ -30,6 +30,7 @@ angular.module('conductorMhdApp')
 
     $scope.$on('socket:control:update', function(e, data) {
       console.log('Got control update: ', data);
+      synth.setParams(data);
     });
 
     control.assign(side);

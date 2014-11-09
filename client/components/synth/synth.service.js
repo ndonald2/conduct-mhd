@@ -97,6 +97,7 @@ angular.module('conductorMhdApp')
     };
 
     var resetInstruments = function() {
+      playingInstruments = {};
       _.each(instruments, function(instrument) {
         instrument.disconnect();
       });
@@ -111,6 +112,20 @@ angular.module('conductorMhdApp')
       var serverSeconds = serverTime / MILLIS_PER_SECOND;
       var modTime = Math.floor(serverSeconds/seqDur) * seqDur;
       return serverSeconds - modTime;
+    };
+
+    var setParam = function(name, value) {
+      if (name.search(':') > 0) {
+        var instName = name.split(':')[0];
+        var paramName = name.split(':')[1];
+
+        var inst = playingInstruments[instName];
+        if (inst) {
+          if (paramName === 'volume') {
+            inst.setVolume(+value);  
+          }
+        }
+      }
     };
 
     return {
@@ -136,6 +151,11 @@ angular.module('conductorMhdApp')
       stop: function() {
         console.log('Stopping synth');
         Tone.Transport.stop();
+      },
+      setParams: function(params) {
+        _.forOwn(params, function(value, name) {
+          setParam(name, value);
+        });
       }
     };
   }]);
