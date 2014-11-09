@@ -43,6 +43,11 @@ angular.module('conductorMhdApp')
       var instrument = instruments[instrumentName]; 
       var sequence = sequences[instrumentName];
 
+      if (!instrument) {
+        console.log('ERROR - not a real instrument: ', instrumentName);
+        return;
+      }
+
       voiceIndexes = voiceIndexes || (function() {
         var vis = [];
         for (var vi=0; vi<sequence.length; vi++) {
@@ -96,10 +101,19 @@ angular.module('conductorMhdApp')
 
     return {
       start: function(opts) {
-        console.log('Starting synth');
+        console.log('Starting synth with opts: ', opts);
+        Tone.Transport.stop();
         resetInstruments();
         initTransport();
-        buildScore(opts.instrument);
+
+        //buildScore('melody');
+        //buildScore('bass');
+        //buildScore('sprinkles');
+        
+        _.forOwn(opts.voices, function(idx, name) {
+          buildScore(name, [idx]);
+        });
+
         var syncedTime = syncedTransportTime(opts.serverTime);
         Tone.Transport.setTransportTime(syncedTime);
         Tone.Transport.start();

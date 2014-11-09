@@ -20,14 +20,16 @@ angular.module('conductorMhdApp')
     $scope.maxLatency = constants.maxLatency;
     $scope.waitingForPing = true;
     $scope.playing = false;
-    
+   
+    var assignedVoices;
+
     $scope.$on('socket:control:assign', function(e, data) {
-      console.log(data);
+      assignedVoices = data;
+      ntp.startMeasurements();
     });
 
     control.assign(side);
 
-    ntp.startMeasurements();
     $scope.$on('ntp:update', function() {
       var goodEnough = evaluateBestLatency(); 
       $scope.waitingForPing = !goodEnough;
@@ -38,8 +40,8 @@ angular.module('conductorMhdApp')
 
     $scope.playIt = function() {
       synth.start({
-        instrument: 'melody',
-        serverTime: ntp.getCurrentServerTime()
+        serverTime: ntp.getCurrentServerTime(),
+        voices: assignedVoices
       });
       $scope.playing = true;
     };
