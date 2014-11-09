@@ -13,8 +13,6 @@ var controlState = {
 
 var registerSocket = function(socket) {
 
-  console.log('Socket registered for controls');
-
   socket.on('control:sync', function() {
     socket.emit('control:update', controlState);
   });
@@ -25,7 +23,6 @@ var registerSocket = function(socket) {
         controlState[key] = data[key]; 
       }
     });
-    console.log('new control state: ', controlState);
     socket.broadcast.emit('control:update', controlState);
   });
 
