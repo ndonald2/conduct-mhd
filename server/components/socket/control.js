@@ -5,7 +5,6 @@ var lastPartAssigned = 0;
 
 var registerSocket = function(socket) {
   socket.on('control:assign', function(data) {
-    console.log('Assign sent ', data);
     var assignedVoices = {
       'sprinkles': 1
     };
@@ -16,6 +15,7 @@ var registerSocket = function(socket) {
       assignedVoices.bass = 1;
     }
     socket.emit('control:assign', assignedVoices); 
+    console.log('Client assigned to: ', assignedVoices);
   });
 };
 
