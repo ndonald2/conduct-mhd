@@ -70,15 +70,27 @@ angular.module('conductorMhdApp')
         for(var step = 0; step < sequenceForThisVoice.length; step++){
           var thisStepVal = sequenceForThisVoice[step];
           if(thisStepVal !== ''){
-            scoreForThisVoice.push(['0:0:' + step, [midiToFreq(50 + thisStepVal)]]);
+            var freq = midiToFreq(50 + thisStepVal);
+            freq = freq * (Math.random() * 0.015 + 1.0);
+            scoreForThisVoice.push(['0:0:' + step, [freq]]);
           }
         }
         
         Tone.Note.route(instrumentName + i, routeFunction);
       });
         
-      instrument.setVolume(-6);
-      instrument.toMaster();
+
+      if (instrumentName === 'sprinkles') {
+        var feedbackDelay = new Tone.PingPongDelay(Math.random() * 0.2 + 0.2);
+        //60% feedback
+    		feedbackDelay.setFeedback(0.2);
+    		//connections
+    		instrument.connect(feedbackDelay);
+    		feedbackDelay.toMaster();	
+    		feedbackDelay.setWet(0.2);
+      } else {
+        instrument.toMaster();
+      }
       Tone.Note.parseScore(Score); 
     };
 
@@ -106,8 +118,8 @@ angular.module('conductorMhdApp')
         resetInstruments();
         initTransport();
 
-        buildScore('melody');
-        buildScore('bass');
+        //buildScore('melody');
+        //buildScore('bass');
         buildScore('sprinkles');
         
         //_.forOwn(opts.voices, function(idx, name) {
