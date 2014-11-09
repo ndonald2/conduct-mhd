@@ -27,6 +27,7 @@ angular.module('conductorMhdApp')
 
     var roundtripCount = 0, 
       MAX_TRIPS = 1000, 
+      measuring = false,
       fastestRoundTrip;
 
     var initiateRoundTrip = function() {
@@ -35,6 +36,9 @@ angular.module('conductorMhdApp')
     return {
       startMeasurements: function() {
 
+        if (measuring) { return; }
+        
+        measuring = true;
         socket.on('ntp', function(data){
           if(roundtripCount++ < MAX_TRIPS){
             setTimeout(function() {
@@ -52,6 +56,7 @@ angular.module('conductorMhdApp')
       },
 
       stopMeasurements: function() {
+        measuring = false;
         socket.removeAllListeners('ntp');
       },
       

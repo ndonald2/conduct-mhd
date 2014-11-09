@@ -1,37 +1,9 @@
 'use strict';
 
 angular.module('conductorMhdApp')
-  .controller('MainCtrl', function ($scope, $location, ntp, constants) {
-      
-      var evaluateBestLatency = function() {
-          var latency = ntp.getBestRoundtripLatency();
-          var isGoodEnough = (latency < constants.maxLatency);
-          $scope.pingLatency = latency;      
-          return isGoodEnough;
-      };
-
-      var startPerforming = function(side) {
-        $location.path('/perform/' + side);
-      };
-
-      ntp.startMeasurements();
-
-      $scope.waitingForPing = false;
+  .controller('MainCtrl', function ($scope, $location, constants) {
       $scope.sides = constants.sides; 
       $scope.perform = function(side) {
-
-        if (evaluateBestLatency()) {
-          startPerforming(side);
-        }
-        else {
-          $scope.waitingForPing = true;
-          $scope.$on('ntp:update', function() {
-            evaluateBestLatency(); 
-          });
-        }
+        $location.path('/perform/' + side);
       };
-
-      $scope.$on('$destroy', function() {
-        ntp.stopMeasurements();
-      });
   });
