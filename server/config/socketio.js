@@ -18,6 +18,7 @@ function onConnect(socket) {
   });
 
   require('./../components/socket/ntp')(socket);
+  require('./../components/socket/control')(socket);
 }
 
 module.exports = function (socketio) {
