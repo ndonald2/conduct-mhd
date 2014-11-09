@@ -9,7 +9,7 @@
     <base href="/">
     <title></title>
     <meta name="description" content="">
-    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css(client) app/vendor.css -->
       <!-- bower:css -->
@@ -27,7 +27,7 @@
     <![endif]-->
 
     <!-- Add your site or application content here -->
-    <div ng-view=""></div>
+    <div ng-view></div>
 
     <!--[if lt IE 9]>
     <script src="bower_components/es5-shim/es5-shim.js"></script>
@@ -51,10 +51,14 @@
         <!-- build:js({.tmp,client}) app/app.js -->
         <script src="app/app.js"></script>
           <!-- injector:js -->
+          <script src="app/conduct/conduct.controller.js"></script>
+          <script src="app/conduct/conduct.js"></script>
+          <script src="app/constants.js"></script>
           <script src="app/main/main.controller.js"></script>
           <script src="app/main/main.js"></script>
-          <script src="components/modal/modal.service.js"></script>
-          <script src="components/navbar/navbar.controller.js"></script>
+          <script src="app/perform/perform.controller.js"></script>
+          <script src="app/perform/perform.js"></script>
+          <script src="components/modal/modal.directive.js"></script>
           <script src="components/socket/ntp/ntp.service.js"></script>
           <script src="components/socket/socket.service.js"></script>
           <!-- endinjector -->

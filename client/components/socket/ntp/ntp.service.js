@@ -23,19 +23,17 @@ var RoundTrip = function(serverResponse) {
 };
 
 angular.module('conductorMhdApp')
-  .factory('ntp', function(socket) {
+  .factory('ntp', function($rootScope, socket) {
 
     var roundtripCount = 0, 
       MAX_TRIPS = 1000, 
       fastestRoundTrip;
 
+    var initiateRoundTrip = function() {
+      socket.emit('ntp', {timeStamp: new Date().getTime()});
+    };
     return {
-      
       startMeasurements: function() {
-
-        var initiateRoundTrip = function() {
-          socket.emit('ntp', {timeStamp: new Date().getTime()});
-        };
 
         socket.on('ntp', function(data){
           if(roundtripCount++ < MAX_TRIPS){
@@ -46,12 +44,17 @@ angular.module('conductorMhdApp')
           var trip = new RoundTrip(data);
           if(!fastestRoundTrip || trip.getCommunicationLatency() < fastestRoundTrip.getCommunicationLatency()){
             fastestRoundTrip = trip;
+            $rootScope.$broadcast('ntp:update');
           }
         });
 
         initiateRoundTrip();
       },
 
+      stopMeasurements: function() {
+        socket.removeAllListeners('ntp');
+      },
+      
       getCurrentServerTime: function(){
         var timeOffset = fastestRoundTrip ? fastestRoundTrip.getTimeOffset() : 0;
         return new Date().getTime() + timeOffset; 
