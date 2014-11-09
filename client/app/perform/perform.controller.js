@@ -30,7 +30,10 @@ angular.module('conductorMhdApp')
     });
 
     $scope.playIt = function() {
-      synth.start(ntp.getCurrentServerTime());
+      synth.start({
+        instrument: 'melody',
+        serverTime: ntp.getCurrentServerTime()
+      });
     };
 
     $scope.$on('synth:beat', function(e, seqPos) {

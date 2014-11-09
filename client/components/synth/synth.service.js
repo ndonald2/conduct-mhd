@@ -95,12 +95,12 @@ angular.module('conductorMhdApp')
     };
 
     return {
-      start: function(serverTime) {
+      start: function(opts) {
         console.log('Starting synth');
         resetInstruments();
         initTransport();
-        buildScore('melody');
-        var syncedTime = syncedTransportTime(serverTime);
+        buildScore(opts.instrument);
+        var syncedTime = syncedTransportTime(opts.serverTime);
         Tone.Transport.setTransportTime(syncedTime);
         Tone.Transport.start();
       },
