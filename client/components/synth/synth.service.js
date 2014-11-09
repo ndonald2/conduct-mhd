@@ -35,29 +35,43 @@ angular.module('conductorMhdApp')
       }, '4n');
     };
 
-    var buildScore = function(instrumentName, voiceIdx) {
+    var buildScore = function(instrumentName, voiceIndexes) {
       var Score = {}; 
+
+      instrumentName = instrumentName || 'melody';
 
       var instrument = instruments[instrumentName]; 
       var sequence = sequences[instrumentName];
 
-      var sequenceForThisVoice = sequence[voiceIdx];
-      var scoreForThisVoice = [];
-      Score[instrumentName + voiceIdx] = scoreForThisVoice;
-      
-      for(var step = 0; step < sequenceForThisVoice.length; step++){
-        var thisStepVal = sequenceForThisVoice[step];
-        if(thisStepVal !== ''){
-          scoreForThisVoice.push(['0:0:' + step, [midiToFreq(70 + thisStepVal)]]);
+      voiceIndexes = voiceIndexes || (function() {
+        var vis = [];
+        for (var vi=0; vi<sequence.length; vi++) {
+          vis.push(vi);
         }
-      }
-        
-      Tone.Note.route(instrumentName + voiceIdx, function(time, value) {
+        return vis;
+      })();
+
+      var routeFunction = function(time, value) {
         for (var note = 0; note < value.length; note++) {
           instrument.triggerAttackRelease(value[note], '16n', time, 1.0);
         }
-      });
+      };
 
+      _.each(voiceIndexes, function(i) {
+        var sequenceForThisVoice = sequence[i];
+        var scoreForThisVoice = [];
+        Score[instrumentName + i] = scoreForThisVoice;
+        
+        for(var step = 0; step < sequenceForThisVoice.length; step++){
+          var thisStepVal = sequenceForThisVoice[step];
+          if(thisStepVal !== ''){
+            scoreForThisVoice.push(['0:0:' + step, [midiToFreq(70 + thisStepVal)]]);
+          }
+        }
+        
+        Tone.Note.route(instrumentName + i, routeFunction);
+      });
+        
       instrument.setVolume(-6);
       instrument.toMaster();
       Tone.Note.parseScore(Score); 
@@ -85,8 +99,7 @@ angular.module('conductorMhdApp')
         console.log('Starting synth');
         resetInstruments();
         initTransport();
-        buildScore('melody', 0);
-        buildScore('melody', 2);
+        buildScore('melody');
         var syncedTime = syncedTransportTime(serverTime);
         Tone.Transport.setTransportTime(syncedTime);
         Tone.Transport.start();
