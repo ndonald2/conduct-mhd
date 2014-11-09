@@ -56,16 +56,19 @@
 
     var currentScale = 0;
 
-    var scaleDegree = function(degree) {
+    var scaleDegree = function(degree, noWrap) {
       var octave = Math.floor(degree / scales[currentScale].length);
       var baseNumber = degree % scales[currentScale].length;
       var ret = scales[currentScale][baseNumber] + 12 * octave;
-      while(ret < 0){
-        ret += 12;
+      if(!noWrap){
+        while(ret < 0){
+          ret += 12;
+        }
+        while(ret > 24){
+          ret -= 12;
+        }
       }
-      while(ret > 24){
-        ret -= 12;
-      }
+
       return ret;    
     }
 
@@ -93,16 +96,19 @@
     // 
     // fast arpegg
     var fastArpeggSeq = [];
+    sprinkles = [];
+
     currentScale = 0;
     for(var section = 0; section < 2 * scales.length; section ++){
       if(section % 2 == 0){
         currentScale = (currentScale + 1) % scales.length;
       }
       for(var i = 0; i < 32; i++){
-        fastArpeggSeq.push(scaleDegree(i % 2+  i % 4 * 2) + 36);
+        fastArpeggSeq.push(scaleDegree(i % 2+  i % 4 * 2, true) + 36);
       }
     }
-    melodySequences.push(fastArpeggSeq)
+    
+    sprinkles.push(fastArpeggSeq);
     
     // "bass line" (room side B)
     currentScale = 0;
@@ -113,7 +119,7 @@
        currentScale = (currentScale + 1) % scales.length;
       }
        bassLine = bassLine.concat([
-          scaleDegree(0), "", "", "", scaleDegree(0), "", "", "", scaleDegree(4), "", "", "", scaleDegree(0), "", "", "", 
+          scaleDegree(0) -12, "", "", "", scaleDegree(0)-12, "", "", "", scaleDegree(4)-12, "", "", "", scaleDegree(0)-12, "", "", "", 
         "", "", "", "","", "", "", "","", "", "", "","", "", "", "" 
       ])
     }
@@ -126,19 +132,19 @@
     /////////////// NICK !!!! the sequences is in the sequences variable //////////////
 
 
-    var sequences = melodySequences.concat(bassSequences);
+    var sequences = melodySequences.concat(bassSequences).concat(sprinkles);
     
 
-    console.log(JSON.stringify({melody:melodySequences, bass: bassSequences}, 3));
+    console.log(JSON.stringify({melody:melodySequences, bass: bassSequences, sprinkles: sprinkles}, 3));
     
     // ====================================================================
     // =                    play back the sequences                       =
     // ====================================================================
     
-    var osc = new Tone.Oscillator(440, "square");
+    var release = 2 + Math.random() * 20;
     
     var keys = new Tone.PolySynth(3, Tone.MonoSynth, {
-    		"oscType" : "sine",
+    		"oscType" : "square",
     		"filter" : {
     			"Q" : 0,
     			"type" : "lowpass",
@@ -148,39 +154,159 @@
     			"attack" : 0.005,
     			"decay" : 1,
     			"sustain" : 0,
-    			"release" : 1
+    			"release" : release
     		},
     		"filterEnvelope" : {
-    			"attack" : 0.06,
+    			"attack" : 2,
     			"decay" : 10,
-    			"sustain" : 1,
-    			"release" : 2,
+    			"sustain" : 0,
+    			"release" : release,
     			"min" : 20,
     			"max" : 4000
     		}
     	});
+    	
+    	
+    //  
+    // for(var voiceIndex = 0; voiceIndex < keys._voices; voiceIndex++){
+    //   var voice = keys._voic
+    //   var amplitudeLFO = new Tone.LFO(10, 0.05, 1);
+    //      var ampAmount = new Tone.DryWet(1);
+    //      var ampNode = Tone.context.createGain();
+    //      keys.connect(ampNode);
+    //      ampNode.connect(ampAmount.wet);
+    //      keys.connect(ampAmount.dry);
+    //      amplitudeLFO.connect(ampNode.gain);
+    //      ampAmount.toMaster();
+    // }
+    //  
+    // 
+    // 
+    //    
+    
+          
+      var amplitudeLFO = new Tone.LFO(10, 0, 1);
+         var ampAmount = new Tone.DryWet(1);
+         var ampNode = Tone.context.createGain();
+         keys.output.connect(ampNode);
+         ampNode.connect(ampAmount.wet);
+         keys.output.connect(ampAmount.dry);
+         amplitudeLFO.connect(ampNode.gain);
+         ampAmount.toMaster();
+    
+    
+
+      //connect it to the master output
+      // keys.toMaster();
+
+    
+    var bass = new Tone.PolySynth(3, Tone.MonoSynth, {
+      		"oscType" : "square",
+      		"filter" : {
+      			"Q" : 0,
+      			"type" : "lowpass",
+      			"rolloff" : -24
+      		},
+      		"envelope" : {
+      			"attack" : 0.005,
+      			"decay" : 1,
+      			"sustain" : 0,
+      			"release" : 1
+      		},
+      		"filterEnvelope" : {
+      			"attack" : 0.06,
+      			"decay" : 10,
+      			"sustain" : 1,
+      			"release" : 2,
+      			"min" : 20,
+      			"max" : 4000
+      		}
+      	});
+      	
+    var sprinklesSynth = new Tone.PolySynth(3, Tone.MonoSynth, {
+        		"oscType" : "square",
+        		"filter" : {
+        			"Q" : 0,
+        			"type" : "lowpass",
+        			"rolloff" : -24
+        		},
+        		"envelope" : {
+        			"attack" : 0.005,
+        			"decay" : 0.1,
+        			"sustain" : 0,
+        			"release" : 0.1
+        		},
+        		"filterEnvelope" : {
+        			"attack" : 0.06,
+        			"decay" : 10,
+        			"sustain" : 1,
+        			"release" : 2,
+        			"min" : 20,
+        			"max" : 4000
+        		}
+        	});
+    
+   // sprinklesSynth.toMaster();
+    var feedbackDelay = new Tone.PingPongDelay(0.2);
+    		//60% feedback
+    		feedbackDelay.setFeedback(0.2);
+    		//connections
+    		sprinklesSynth.connect(feedbackDelay);
+    		feedbackDelay.toMaster();	
+    		feedbackDelay.setWet(0.2);
+
+
+    
+    
+    
+    window.keys = keys;
     
     var midiToFreq = function(midiNote){
       return 440 * Math.pow(2, (midiNote-69)/12);
     }
     
-    
-    //connect it to the master output
-    keys.toMaster();
+    bass.toMaster();
     
     var secsPer16th = 0.1;
     
     var Score = {};
+
+    for(var i = 0; i < sprinkles.length; i++){
+      var sequenceForThisVoice = sprinkles[i];
+      var scoreForThisVoice = []
+      Score["sprinkles" + i] = scoreForThisVoice;
+      
+      for(var step = 0; step < sequenceForThisVoice.length; step++){
+        var thisStepVal = sequenceForThisVoice[step];
+        if(thisStepVal !== ""){
+          scoreForThisVoice.push(["0:0:" + step, [(1 + Math.random()*0.01) *  midiToFreq(50 + thisStepVal)]]);
+        }
+      }
+      
+      (function() {
+        var voice = i;
+        Tone.Note.route("sprinkles" + i, function(time, value){
+        			var velocity = 1;
+        			for (var note = 0; note < value.length; note++) {
+                // console.log("voice " + voice);
+        				sprinklesSynth.triggerAttackRelease(value[note], "16n", time, velocity);
+        			}
+        		});
+        		
+      })()      
+    }
+
+
     		
-    for(var i = 0; i < sequences.length; i++){
-      var sequenceForThisVoice = sequences[i];
+    for(var i = 0; i < melodySequences.length; i++){
+      var sequenceForThisVoice = melodySequences[i];
       var scoreForThisVoice = []
       Score["keys" + i] = scoreForThisVoice;
       
       for(var step = 0; step < sequenceForThisVoice.length; step++){
         var thisStepVal = sequenceForThisVoice[step];
         if(thisStepVal !== ""){
-          scoreForThisVoice.push([step * secsPer16th, [midiToFreq(50 + thisStepVal)]]);
+          scoreForThisVoice.push(["0:0:" + step, [(1 + Math.random()*0.01) *  midiToFreq(50 + thisStepVal)]]);
         }
       }
       
@@ -194,12 +320,36 @@
         			}
         		});
         		
-      })()
-      
-
-      
+      })()      
     }
     		
+    		
+    		
+    for(var i = 0; i < bassSequences.length; i++){
+      var sequenceForThisVoice = bassSequences[i];
+      var scoreForThisVoice = []
+      Score["bass" + i] = scoreForThisVoice;
+      
+      for(var step = 0; step < sequenceForThisVoice.length; step++){
+        var thisStepVal = sequenceForThisVoice[step];
+        if(thisStepVal !== ""){
+          scoreForThisVoice.push(["0:0:" + step, [(1 + Math.random()*0.01) *  midiToFreq(50 + thisStepVal)]]);
+        }
+      }
+      
+      (function() {
+        var voice = i;
+        Tone.Note.route("bass" + i, function(time, value){
+        			var velocity = 1;
+        			for (var note = 0; note < value.length; note++) {
+                // console.log("voice " + voice);
+        				bass.triggerAttackRelease(value[note], "16n", time, velocity);
+        			}
+        		});
+        		
+      })()      
+    }
+    
 
     	
     		//create events for all of the notes
@@ -209,7 +359,7 @@
     		Tone.Transport.setLoopStart(0);
     		Tone.Transport.setLoopEnd( secsPer16th * sequences[0].length  );
     		Tone.Transport.loop = true;
-    		Tone.Transport.setBpm(100);
+    		Tone.Transport.setBpm(120);
     		
     		Tone.Transport.start();
     
