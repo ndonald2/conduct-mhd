@@ -23,7 +23,7 @@ var RoundTrip = function(serverResponse) {
 };
 
 angular.module('conductorMhdApp')
-  .factory('ntp', function(socket) {
+  .factory('ntp', function($rootScope, socket) {
 
     var roundtripCount = 0, 
       MAX_TRIPS = 1000, 
@@ -44,6 +44,7 @@ angular.module('conductorMhdApp')
           var trip = new RoundTrip(data);
           if(!fastestRoundTrip || trip.getCommunicationLatency() < fastestRoundTrip.getCommunicationLatency()){
             fastestRoundTrip = trip;
+            $rootScope.$broadcast('ntp:update');
           }
         });
 
