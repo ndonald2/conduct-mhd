@@ -28,6 +28,11 @@ angular.module('conductorMhdApp')
       ntp.startMeasurements();
     });
 
+    $scope.$on('socket:control:update', function(e, data) {
+      console.log('Got control update: ', data);
+      synth.setParams(data);
+    });
+
     control.assign(side);
 
     $scope.$on('ntp:update', function() {
@@ -43,6 +48,7 @@ angular.module('conductorMhdApp')
         serverTime: ntp.getCurrentServerTime(),
         voices: assignedVoices
       });
+      control.sync();
       $scope.playing = true;
     };
 
