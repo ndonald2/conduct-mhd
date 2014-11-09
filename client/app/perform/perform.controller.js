@@ -33,8 +33,8 @@ angular.module('conductorMhdApp')
       synth.start(ntp.getCurrentServerTime());
     };
 
-    $scope.$on('synth:beat', function(e, beat) {
-      $scope.beatNum = beat;
+    $scope.$on('synth:beat', function(e, seqPos) {
+      $scope.beatNum = seqPos;
       $scope.$apply();
     });
 
