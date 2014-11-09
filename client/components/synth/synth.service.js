@@ -13,6 +13,9 @@ angular.module('conductorMhdApp')
     var SEQ_LENGTH_MEASURES = 12;
     var MILLIS_PER_SECOND = 1000;
     var SECONDS_PER_MEASURE = (60.0 / BPM) * 4;
+
+    // Variables
+    var playingInstruments = {};
        		
     // Functions
     var midiToFreq = function(midiNote){
@@ -36,8 +39,6 @@ angular.module('conductorMhdApp')
     };
 
     var buildScore = function(instrumentName, voiceIndexes) {
-      var Score = {}; 
-
       instrumentName = instrumentName || 'melody';
 
       var instrument = instruments[instrumentName]; 
@@ -56,16 +57,10 @@ angular.module('conductorMhdApp')
         return vis;
       })();
 
-      var routeFunction = function(time, value) {
-        for (var note = 0; note < value.length; note++) {
-          instrument.triggerAttackRelease(value[note], '16n', time, 1.0);
-        }
-      };
 
       _.each(voiceIndexes, function(i) {
         var sequenceForThisVoice = sequence[i];
         var scoreForThisVoice = [];
-        Score[instrumentName + i] = scoreForThisVoice;
         
         for(var step = 0; step < sequenceForThisVoice.length; step++){
           var thisStepVal = sequenceForThisVoice[step];
@@ -74,11 +69,19 @@ angular.module('conductorMhdApp')
             freq = freq * (Math.random() * 0.015 + 1.0);
             scoreForThisVoice.push(['0:0:' + step, [freq]]);
           }
-        }
-        
-        Tone.Note.route(instrumentName + i, routeFunction);
+        }  
+        var score = {};
+        score[instrumentName] = scoreForThisVoice;
+        Tone.Note.parseScore(score); 
       });
-        
+
+      var routeFunction = function(time, value) {
+        for (var note = 0; note < value.length; note++) {
+          instrument.triggerAttackRelease(value[note], '16n', time, 1.0);
+        }
+      };
+      Tone.Note.route(instrumentName, routeFunction);
+      playingInstruments[instrumentName] = instrument;
 
       if (instrumentName === 'sprinkles') {
         var feedbackDelay = new Tone.PingPongDelay(Math.random() * 0.2 + 0.2);
@@ -87,11 +90,10 @@ angular.module('conductorMhdApp')
     		//connections
     		instrument.connect(feedbackDelay);
     		feedbackDelay.toMaster();	
-    		feedbackDelay.setWet(0.2);
+    		feedbackDelay.setWet(0.1);
       } else {
         instrument.toMaster();
       }
-      Tone.Note.parseScore(Score); 
     };
 
     var resetInstruments = function() {
@@ -118,6 +120,7 @@ angular.module('conductorMhdApp')
         resetInstruments();
         initTransport();
 
+        // uncomment for 'dev mode' (all voices)
         //buildScore('melody');
         //buildScore('bass');
         //buildScore('sprinkles');
