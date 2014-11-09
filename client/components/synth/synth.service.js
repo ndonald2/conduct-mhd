@@ -1,27 +1,23 @@
 /* jshint quotmark: false*/
-/* global Tone */
+/* global Tone, _ */
 'use strict';
 
 angular.module('conductorMhdApp')
   .service('synth', function() {
          
-	  var baseScale = [0,2,3,5,7,9,10];
-	  
-	  var scales = [];
-	  
-	  var addScale = function(offset) {
-	    var newScale = [];
-	    for(var i = 0; i < baseScale.length; i++){
-	      newScale.push(baseScale[i] + offset);
-	    }
-	    scales.push(newScale);
-	  };
 
-	  var offsets = [0, -5, 0, -5, 0, -1];
-	  for(var i = 0; i < offsets.length; i++){  
-  	  addScale(offsets[i]);
-	  }
-	  
+    // Build sequences
+    var NUM_ARPEGG_VOICES = 8;
+    var sequences = [];
+
+    var baseScale = [0, 2, 3, 5, 7, 9, 10];
+    var offsets = [0, -5, 0, -5, 0, -1];
+    var scales = _.map(offsets, function(offset) {
+      return _.map(baseScale, function(note) {
+        return note + offset;
+      });
+    });
+      
     var currentScale = 0;
 
     var scaleDegree = function(degree) {
@@ -30,10 +26,6 @@ angular.module('conductorMhdApp')
       return scales[currentScale][baseNumber] + 12 * octave;    
     };
 
-
-    var NUM_ARPEGG_VOICES = 8;
-
-    var sequences = [];
     for(var seqIndex = 0; seqIndex < NUM_ARPEGG_VOICES; seqIndex++){
       var seq = [];
       sequences.push(seq);
@@ -51,7 +43,6 @@ angular.module('conductorMhdApp')
         }
       }
     }
-
 
     /////////////// NICK !!!! the sequences is in the sequences variable //////////////
 
