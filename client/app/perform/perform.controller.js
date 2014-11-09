@@ -26,9 +26,7 @@ angular.module('conductorMhdApp')
       $scope.waitingForPing = !goodEnough;
       if (goodEnough) {
         ntp.stopMeasurements();
-
-        // TODO: pass in the time offset here
-        synth.start();
+        synth.start(ntp.getCurrentServerTime());
       }
     });
 

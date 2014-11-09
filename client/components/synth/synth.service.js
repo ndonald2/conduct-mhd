@@ -6,8 +6,8 @@ angular.module('conductorMhdApp')
         
     // Constants
     var BPM = 100;
-    var SECONDS_PER_16TH = (60.0 / BPM) / 4;
     var MILLIS_PER_SECOND = 1000;
+    var SECONDS_PER_MEASURE = (60.0 / BPM) * 4;
 
     var Score = {
       'longTones' : [['0:0', 'A2'], ['0:1', 'A3'], ['0:2', 'A2'], ['0:3', 'A3']]
@@ -25,16 +25,22 @@ angular.module('conductorMhdApp')
     Tone.Transport.loop = true;
     Tone.Transport.setBpm(BPM);
 
-    function syncedTimeOffset(serverTime) {
+    function syncedTransportTime(serverTime) {
       if (!serverTime) {
-        return Tone.Transport.now();
+        return 0;
       }
+      
+      var serverSeconds = serverTime / MILLIS_PER_SECOND;
+      var modTime = Math.floor(serverSeconds/SECONDS_PER_MEASURE) * SECONDS_PER_MEASURE;
+      return serverSeconds - modTime;
     }
 
     return {
       start: function(serverTime) {
         console.log('Starting synth');
-        Tone.Transport.start(syncedTimeOffset(serverTime));
+        var syncedTime = syncedTransportTime(serverTime);
+        Tone.Transport.setTransportTime(syncedTime);
+        Tone.Transport.start();
       },
       stop: function() {
         console.log('Stopping synth');
