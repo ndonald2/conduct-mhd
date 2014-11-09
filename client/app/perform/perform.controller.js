@@ -2,18 +2,19 @@
 
 angular.module('conductorMhdApp')
   .controller('PerformCtrl', function ($scope, $location, $routeParams, synth, ntp, constants) {
+    
+    function evaluateBestLatency() {
+        var latency = ntp.getBestRoundtripLatency();
+        $scope.pingLatency = latency;      
+        return (latency < constants.maxLatency);
+    }
+
     var side = $routeParams.side ? $routeParams.side : 'A';
   
     // If it's not a valid route param, just bail out to the main page
     if(!_.contains(constants.sides, side)) {
       $location.path('/');
     }
-
-    var evaluateBestLatency = function() {
-        var latency = ntp.getBestRoundtripLatency();
-        $scope.pingLatency = latency;      
-        return (latency < constants.maxLatency);
-    };
 
     $scope.side = side;
     $scope.maxLatency = constants.maxLatency;
@@ -29,6 +30,11 @@ angular.module('conductorMhdApp')
         // TODO: pass in the time offset here
         synth.start();
       }
+    });
+
+    $scope.$on('synth:beat', function(e, beat) {
+      $scope.beatNum = beat;
+      $scope.$apply();
     });
 
     $scope.$on('$destroy', function() {
