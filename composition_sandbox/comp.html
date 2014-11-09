@@ -63,15 +63,15 @@
       while(ret < 0){
         ret += 12;
       }
+      while(ret > 24){
+        ret -= 12;
+      }
       return ret;    
     }
 
     var NUM_ARPEGG_VOICES = 8;
-
-    
-    
-    
-    //arpeggios (room side A)
+ 
+     //arpeggios (room side A)
     var melodySequences = [];
     for(var seqIndex = 0; seqIndex < NUM_ARPEGG_VOICES; seqIndex++){
       var seq = []
@@ -81,8 +81,8 @@
         if(section % 2 == 0){
           currentScale = (currentScale + 1) % scales.length;
         }
-        for(var i = 0; i < 16; i++){
-          if(i == seqIndex){
+        for(var i = 0; i < 32; i++){
+          if(i == seqIndex * 2){
             seq.push(scaleDegree(i * 2))
           }else{
             seq.push("")
@@ -90,7 +90,20 @@
         }
       }
     }
-
+    // 
+    // fast arpegg
+    var fastArpeggSeq = [];
+    currentScale = 0;
+    for(var section = 0; section < 2 * scales.length; section ++){
+      if(section % 2 == 0){
+        currentScale = (currentScale + 1) % scales.length;
+      }
+      for(var i = 0; i < 32; i++){
+        fastArpeggSeq.push(scaleDegree(i % 2+  i % 4 * 2) + 36);
+      }
+    }
+    melodySequences.push(fastArpeggSeq)
+    
     // "bass line" (room side B)
     currentScale = 0;
     var bassLine = [];
@@ -99,7 +112,10 @@
       if(section % 2 == 0){
        currentScale = (currentScale + 1) % scales.length;
       }
-       bassLine = bassLine.concat([scaleDegree(0), "", scaleDegree(0), "", scaleDegree(4), "", scaleDegree(0), "", "", "", "", "", "", "", "", "" ])
+       bassLine = bassLine.concat([
+          scaleDegree(0), "", "", "", scaleDegree(0), "", "", "", scaleDegree(4), "", "", "", scaleDegree(0), "", "", "", 
+        "", "", "", "","", "", "", "","", "", "", "","", "", "", "" 
+      ])
     }
     
     bassSequences.push(bassLine);
@@ -113,7 +129,7 @@
     var sequences = melodySequences.concat(bassSequences);
     
 
-    console.log(sequences);
+    console.log(JSON.stringify({melody:melodySequences, bass: bassSequences}, 3));
     
     // ====================================================================
     // =                    play back the sequences                       =
@@ -130,9 +146,9 @@
     		},
     		"envelope" : {
     			"attack" : 0.005,
-    			"decay" : 10 + Math.random() * 4,
-    			"sustain" : 1,
-    			"release" : 1 + Math.random() * 40
+    			"decay" : 1,
+    			"sustain" : 0,
+    			"release" : 1
     		},
     		"filterEnvelope" : {
     			"attack" : 0.06,
@@ -152,7 +168,7 @@
     //connect it to the master output
     keys.toMaster();
     
-    var secsPer16th = 0.2;
+    var secsPer16th = 0.1;
     
     var Score = {};
     		
@@ -173,7 +189,7 @@
         Tone.Note.route("keys" + i, function(time, value){
         			var velocity = 1;
         			for (var note = 0; note < value.length; note++) {
-        			  console.log("voice " + voice);
+                // console.log("voice " + voice);
         				keys.triggerAttackRelease(value[note], "16n", time, velocity);
         			}
         		});
