@@ -19,7 +19,12 @@ angular.module('conductorMhdApp')
     };
 
     $scope.$on('socket:control:update', function(e, data) {
-      console.log('Controls updated:', data);
+      _.forOwn(data, function(val, id) {
+        var ctrl = controls[id];
+        if (ctrl) {
+          ctrl.value = +val;
+        }
+      });
     });
 
     control.sync();
