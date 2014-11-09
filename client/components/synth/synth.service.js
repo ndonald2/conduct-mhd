@@ -9,7 +9,7 @@ angular.module('conductorMhdApp')
       function($rootScope, sequences, instruments) {
 
     // Local Constants
-    var BPM = 100;
+    var BPM = 120;
     var SEQ_LENGTH_MEASURES = 12;
     var MILLIS_PER_SECOND = 1000;
     var SECONDS_PER_MEASURE = (60.0 / BPM) * 4;
@@ -70,7 +70,7 @@ angular.module('conductorMhdApp')
         for(var step = 0; step < sequenceForThisVoice.length; step++){
           var thisStepVal = sequenceForThisVoice[step];
           if(thisStepVal !== ''){
-            scoreForThisVoice.push(['0:0:' + step, [midiToFreq(70 + thisStepVal)]]);
+            scoreForThisVoice.push(['0:0:' + step, [midiToFreq(50 + thisStepVal)]]);
           }
         }
         
@@ -106,13 +106,13 @@ angular.module('conductorMhdApp')
         resetInstruments();
         initTransport();
 
-        //buildScore('melody');
-        //buildScore('bass');
-        //buildScore('sprinkles');
+        buildScore('melody');
+        buildScore('bass');
+        buildScore('sprinkles');
         
-        _.forOwn(opts.voices, function(idx, name) {
-          buildScore(name, [idx]);
-        });
+        //_.forOwn(opts.voices, function(idx, name) {
+        //  buildScore(name, [idx]);
+        //});
 
         var syncedTime = syncedTransportTime(opts.serverTime);
         Tone.Transport.setTransportTime(syncedTime);
